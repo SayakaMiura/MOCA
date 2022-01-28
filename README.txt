@@ -1,7 +1,7 @@
 MOCA_v0.1.2  
 (Copyright 2021, Authors and Temple University; see license below)
 
-Updated January 27, 2022
+Updated January 28, 2022
 ==================
 
 The MOCA (Multi Omics Concordance Analysis) tool has been developed by Jared Huzar. It is written in R (version 3.6.2) on Windows platform (64-bit). You are free to download, modify, and expand this code under a permissive license similar to the BSD 2-Clause License (see below). 
@@ -20,7 +20,10 @@ Dependencies
     ggplot2
     apTreeshape
     dplyr
- Please make sure “Rscript ” command is functional.
+    lsr
+    stats
+ 
+ Please make sure Rscript command is functional.
 
 How to use 
 ==================
@@ -38,7 +41,7 @@ Please see the MOCA manual for more details regarding installation and usage of 
 
 Output files
 ==================
-MOCA’s functions produce several output files and figures. They will appear in the working directory after the functions are run.
+MOCA's functions produce several output files and figures. They will appear in the working directory after the functions are run.
 
 Example
 ==================
@@ -48,7 +51,7 @@ Data
 ==================
 The provided phylogenetic tree (MOCA\Example\tree1.nwk) is in standard newick format and has been inferred using BEAM. The example data stems from a glioblastoma tumor dataset, see Patel et al (see ref 3) for more information on the dataset. Any tree in a standard newick format can be used in MOCA. The provided annotation file (MOCA\Example\annotate_file1.txt) is the result of running BalancedAnnotation on the phylogenetic tree and removing cells which had no ancestry designation and/or cells which were excluded from the expression matrix (MOCA\Example\expression_matrix1.txt). The annotation file must contain two columns. The first column should contain the cell IDs which must match with the column names of the expression matrix, and the second column must contain the cells’ ancestry annotations. The row names must also be the cell IDs. For MOCA, the expression matrix must be a data frame with each row corresponding to a gene, and each column corresponding to a cell. The gene IDs must be the row names and the cell IDs must be the column names. Please see the example data (MOCA\Example\) and the MOCA manual (MOCA_Manual.pdf) for further reference on how to format input data.
 
-All data pertaining to the results in the manuscript is available (Data\). There is a folder containing all of the phylogenetic trees (Data\Trees\), a folder with all of the expression matrices (Data\Expression\), and a folder with all of the annotation files (Data\Annotations\). This data is all from Patel et al (ref 3). There are 2 different tumors, MGH26 and MGH31. For each tumor there are 4 different trees, expression matrices, and annotation files. The different data files stem from reconstruction using different methods, BEAM (ref 4) and SCITE (ref 5), and different base assignment cutoffs (bases with >60% and >70% of cells were retained). Expression matrices, trees, and annotation files are labeled based on their reconstruction method and which tumor they are from, e.g., “MGH26BEAM7Annotation.txt”. In addition, there is one expression matrix and one annotation file based on CNV annotations which were originally reported in (ref 6). For more information regarding the data processing and reconstruction please see Huzar et al (ref. 1).
+All data pertaining to the results in the manuscript is available (Data\). There is a folder containing all of the phylogenetic trees (Data\Trees\), a folder with all of the expression matrices (Data\Expression\), and a folder with all of the annotation files (Data\Annotations\). The data comes from two different studies. Data marked with "Hou" comes from Hou et al (ref 7), and data marked with "MGH26" or "MGH31" is from Patel et al (ref 3). From the Patel et al. study there are 2 different tumors, MGH26 and MGH31. For each tumor there are 4 different trees, expression matrices, and annotation files. The different data files stem from reconstruction using different methods, BEAM (ref 4) and SCITE (ref 5), and different base assignment cutoffs (bases with >60% and >70% of cells were retained). Expression matrices, trees, and annotation files are labeled based on their reconstruction method and which tumor they are from, e.g., MGH26BEAM7Annotation.txt. In addition, there is one expression matrix and one annotation file based on CNV annotations which were originally reported in (ref 6). For more information regarding the data processing and reconstruction please see Huzar et al (ref. 1).
 
 ==================
 Reference:
@@ -63,6 +66,8 @@ Reference:
 [5] Jahn K, Kuipers J, Beerenwinkel N. Tree inference for single-cell data. Genome Biol. 2016;17:86.
 
 [6] Serin Harmanci A, Harmanci AO, Zhou X. CaSpER identifies and visualizes CNV events by integrative analysis of single-cell or bulk RNA-sequencing data. Nat Commun. 2020;11(1):89.
+
+[7] Hou, Y., Guo, H., Cao, C., Li, X., Hu, B., Zhu, P., . . . Peng, J. (2016). Single-cell triple omics sequencing reveals genetic, epigenetic, and transcriptomic heterogeneity in hepatocellular carcinomas. Cell Res, 26(3), 304-319. https://doi.org/10.1038/cr.2016.23
 
 --------
 Copyright 2021, Authors and Temple University
