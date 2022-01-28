@@ -9,7 +9,9 @@ AncestryComparison <- function(reference_tree ,reference_annotations,alternates)
   if(file_type == "nwk"){
     ref_tree <-phytools::read.newick(reference_tree)
     removes1 <- which(reference_annotations[,ncol(reference_annotations)] == "None")
+    removes2 <- which(ref_tree$tip.label %in% reference_annotations[,1] == FALSE)
     tips1 <- which(ref_tree$tip.label %in% row.names(reference_annotations)[removes1])
+    ref_tree <- drop.tip(ref_tree,removes2)
     ref_tree <- drop.tip(ref_tree, tips1) #Removes tips from the tree which have no ancestry designation.
   }
   if(length(removes1) > 0){
@@ -58,7 +60,8 @@ AncestryComparison <- function(reference_tree ,reference_annotations,alternates)
       anno_name <- substring(annotations2,begin[nrow(begin), ncol(begin)] + 1,nchar(annotations2)-4)
       colnames(heat)[c+1] <- paste0(anno_name, c)
     }else{
-      anno_table <- read.table(paste0(annotations2))
+      anno_table <- read.table(paste0(annotations2), stringsAsFactors = FALSE)
+      anno_table[,1] <- row.names(anno_table)
       anno_table <- anno_table[which(anno_table[,1] %in% reference_annotations[,1] == TRUE), 1:2]
       redo <- match(anno_table[,1], row.names(heat))
       anno_table2 <- data.frame(matrix(nrow = nrow(heat), ncol = 1))
@@ -96,6 +99,10 @@ AncestryComparison <- function(reference_tree ,reference_annotations,alternates)
     colors2[a,1]<- color_code[rowCode,1]
   }
   color_code <- color_code[order(color_code[,2]),]
+  colors_new <- data.frame(matrix(nrow = nrow(reference_annotations), ncol = 1))
+  for(e in 1:nrow(colors2)){
+    colors_new[which(ref_tree$tip.label == row.names(heat)[e]),1] <- colors2[e,1]
+  }
   for(d in 1:ncol(heat)){
     if(d ==1){
       colnames(heat)[1] <- "Reference"
@@ -117,7 +124,7 @@ AncestryComparison <- function(reference_tree ,reference_annotations,alternates)
   row.names(heatNum) <- row.names(heat)
   
   if(exists("ref_tree")){
-    px <- ggtree(ref_tree) + geom_tippoint(color = colors2[,1], size = 2)+scale_color_manual(values=c(sort(colors3)))
+    px <- ggtree(ref_tree) + geom_tippoint(color = colors_new[,1], size = 2)+scale_color_manual(values=c(sort(colors3)))
     print(gheatmap(px, heat, font.size = 2)+scale_fill_manual(values=c(color_code[,1]), name="GeneticAncestry"))
   }else{
     heatmap(as.matrix(heatNum), Rowv = NA, Colv = NA)+scale_fill_manual(values=c(colors3), name="GeneticAncestry")
@@ -175,6 +182,45 @@ AncestryComparison <- function(reference_tree ,reference_annotations,alternates)
     }else{
       heatmap(as.matrix(heat3), Rowv = NA, Colv = NA)+scale_fill_manual(values=c(colors3), name="GeneticAncestry")
     }
+    
+    #Calculates the Cramer's V score and p-value from Chi square test for each pairwise annotation.
+    rm1 <- as.integer(which(color_code[,2] == "Unknown"))
+    rm2 <- as.integer(which(color_code[,2] == "Removed"))
+    max1 <- ncol(heat3)-1
+    cramer_scores <- data.frame(matrix(nrow= ncol(heat3), ncol = ncol(heat3)))
+    chi_square_pval <- data.frame(matrix(nrow= ncol(heat3), ncol = ncol(heat3)))
+    for (h in 1:max1) {
+      j <- h+1
+      for(i in j:ncol(heat3)){
+        vector1 <- heat3[,h]
+        vector2 <- heat3[,i]
+        l1 <- which(vector1 == rm1)
+        l2 <- which(vector1 == rm2)
+        l3 <- which(vector2 == rm1)
+        l4 <- which(vector2 == rm2)
+        l_21 <- append(l1,l2)
+        l_22 <- append(l_21,l3)
+        l_23 <- append(l_22,l4)
+        l_fin <- unique(l_23)
+        if(length(l_fin) != 0){
+          vector1 <- vector1[-l_fin]
+          vector2 <- vector2[-l_fin]
+        }
+        contingency <- table(vector1,vector2)
+        cramers_Value <- cramersV(contingency)[1]
+        pVal <- chisq.test(contingency)[3]
+        cramer_scores[h,i] <- cramers_Value
+        cramer_scores[i,h] <- cramers_Value
+        chi_square_pval[h,i] <- pVal
+        chi_square_pval[i,h] <- pVal
+      }
+    }
+    colnames(cramer_scores) <- colnames(heat3)
+    row.names(cramer_scores) <- colnames(heat3)
+    colnames(chi_square_pval) <- colnames(heat3)
+    row.names(chi_square_pval) <- colnames(heat3)
+    write.table(chi_square_pval, file = "Chi_Squared_pVal.txt")
+    write.table(cramer_scores, file = "Cramer_Vmeasure.txt")
     return(heat4)
   }else{
     return(heat)
