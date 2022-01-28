@@ -1,7 +1,7 @@
-MOCA_v0.1.1  
+MOCA_v0.1.2  
 (Copyright 2021, Authors and Temple University; see license below)
 
-Updated November 29, 2021
+Updated January 27, 2022
 ==================
 
 The MOCA (Multi Omics Concordance Analysis) tool has been developed by Jared Huzar. It is written in R (version 3.6.2) on Windows platform (64-bit). You are free to download, modify, and expand this code under a permissive license similar to the BSD 2-Clause License (see below). 
